@@ -15,35 +15,35 @@ public class Server {
 
         boolean isFirstCity = true;
         String currentCity = "";
-        String inputCity = "";
+        String inputCity;
 
-        try (ServerSocket socket = new ServerSocket(Config.PORT);) {
+        try (ServerSocket serverSocket = new ServerSocket(Config.PORT);) {
             System.out.println("Server started");
 
             while (true) {
-                try (Socket client = socket.accept();
-                     PrintWriter in = new PrintWriter(client.getOutputStream(), true);
-                     BufferedReader out = new BufferedReader(new InputStreamReader(client.getInputStream()))) {
+                try (Socket client = serverSocket.accept();
+                     PrintWriter out = new PrintWriter(client.getOutputStream(), true);
+                     BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()))) {
 
                     if (isFirstCity) {
-                        in.println(ENTER_FIRST_CITY);
+                        out.println(ENTER_FIRST_CITY);
 
-                        inputCity = out.readLine();
+                        inputCity = in.readLine();
                         System.out.println(String.format("Client sent: %s", inputCity));
 
                         currentCity = inputCity;
                         isFirstCity = false;
                     } else {
-                        in.println(currentCity);
+                        out.println(currentCity);
 
-                        inputCity = out.readLine();
+                        inputCity = in.readLine();
                         System.out.println(String.format("Client sent: %s", inputCity));
 
                         if (checkInput(inputCity, currentCity)) {
                             currentCity = inputCity;
-                            in.println("OK");
+                            out.println("OK");
                         } else if (!checkInput(inputCity, currentCity)) {
-                            in.println("NOT OK");
+                            out.println("NOT OK");
                         }
                     }
                 } catch (IOException ex) {
